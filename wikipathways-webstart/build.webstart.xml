@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<project name="WikiPathways webstart" default="jar" basedir=".">
+
+	<!-- always be java 1.5 compatible -->
+	<property name="ant.build.javac.target" value="1.5"/>
+	<property name="ant.build.javac.source" value="1.5"/>
+
+  <property name="base.name" value="WikiPathwaysWebstart"/>
+  <property name="jar.name" value="dist/${base.name}.jar"/>
+  <property name="pathvisio.dir" value="../../pathvisio"/>
+  <!-- The path containing the jar files for all PathVisio plugins that need to be included -->
+  <property name="plugins.jar.dir" value="webstart-plugin-jars" />
+  
+  	<path id="project.class.path">
+		<fileset dir="${pathvisio.dir}/modules">
+			<include name="org.pathvisio.core.jar"/>
+			<include name="org.pathvisio.desktop.jar"/>
+			<include name="org.pathvisio.gui.jar"/>
+		</fileset>
+		<fileset dir="${pathvisio.dir}/lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+  <target name="prepare">
+	<mkdir dir="build"/>
+	<fail message="Can't find ${pathvisio.dir}/modules/org.pathvisio.core.jar, please specify the path to pathvisio with -Dpathvisio.dir=....">
+		<condition>
+			<not><available file="${pathvisio.dir}/modules/org.pathvisio.core.jar"/></not>
+		</condition>
+	</fail>
+  </target>
+  
+	<target name="jar">
+		<echo>Creating JAR: ${jar.name}</echo>
+		<!-- create a plug-in jar that contains all plug-in classes, as well as the dependent libraries -->
+		<unjar dest="build">
+			<fileset dir="${pathvisio.dir}"><include name="modules/*.jar"/></fileset>
+			<fileset dir="${pathvisio.dir}"><include name="lib/**/*.jar"/></fileset>
+			<fileset dir="${plugins.jar.dir}"><include name="*.jar"/></fileset>
+		</unjar>
+		<jar jarfile="${jar.name}" manifest="META-INF/MANIFEST.MF">
+			<fileset dir="build">
+				<include name="**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+  <target name="clean">
+	<delete dir="build"/>
+  </target>
+
+  <target name="dist-clean" depends="clean">
+	<delete file="${jar.name}"/>
+  </target>
+  
+  <target name="webstart" depends="jar">
+	<fail message="Can't find ${pathvisio.dir}/pathvisio.jar, please specify the path to pathvisio with -Dpathvisio.dir=....">
+		<condition>
+			<not><available file="${pathvisio.dir}/pathvisio.jar"/></not>
+		</condition>
+	</fail>
+	<fail message="You must specify a keystore password for opening visioKeyStore: ant -Dkeystore.password=***** [ant target]">
+		<condition>
+			<not> <isset property="keystore.password"/> </not>
+		</condition>
+	</fail>
+	<fail message="You must specify a destination base URL: ant -Dwebstart.base.url=http://localhost/webstart [ant target]">
+		<condition>
+			<not> <isset property="webstart.base.url"/> </not>
+		</condition>
+	</fail>
+	
+	<!-- our webstart deployment directory -->
+	<mkdir dir="webstart"/>
+	
+	<!-- create the jnlp. We do this by using pathvisio's jnlp as a template -->
+	<copy file="${pathvisio.dir}/webstart/pathvisio.jnlp" toDir="webstart"/>
+	<move file="webstart/pathvisio.jnlp" tofile="webstart/${base.name}.jnlp"/>
+	<!-- modify the base url in the jnlp-->
+	<replace file="webstart/${base.name}.jnlp" token="#BASEURL#" value="${webstart.base.url}"/>
+	<!-- modify the reference to pathvisio.jnlp -->
+	<replace file="webstart/${base.name}.jnlp" token="pathvisio.jnlp" value="${base.name}.jnlp"/>
+	<!-- modify the reference to pathvisio.jar -->
+	<replace file="webstart/${base.name}.jnlp" token="pathvisio.jar" value="${base.name}.jar"/>
+	
+	<!-- we're creating a new webstart jar, based on pathvisio.jar, but with addition of our plug-in jar -->
+	<copy file="${pathvisio.dir}/pathvisio.jar" toDir="webstart"/>
+	<move file="webstart/pathvisio.jar" tofile="webstart/${base.name}.jar"/>
+	<!-- unjar everything to a temporary directory -->
+	<mkdir dir="build/temp"/>
+	<unjar src="${pathvisio.dir}/pathvisio.jar" dest="build/temp"/>
+	<copy file="${jar.name}" toDir="build/temp"/>
+	<!-- and jar everything back together again -->
+	<jar file="webstart/${base.name}.jar" basedir="build/temp"/>
+	<delete dir="build/temp"/>
+	
+	<!-- finally, sign the jar -->
+	<signjar jar="webstart/${base.name}.jar"
+		alias="PV" storepass="${keystore.password}" keystore="${pathvisio.dir}/lib/visioKeyStore"/>
+  </target>
+
+</project>
