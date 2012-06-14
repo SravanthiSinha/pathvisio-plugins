@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: WikiPathwaysClientPlugin
+Bundle-SymbolicName: WikiPathwaysClientPlugin
+Bundle-Version: 1.0.0
+Bundle-Activator: org.tno.wpclient.Activator
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: org.osgi.framework;version="1.3.0"
+Require-Bundle: org.pathvisio.core;bundle-version="2.0.11",
+ org.pathvisio.desktop;bundle-version="2.0.11",
+ org.pathvisio.gui;bundle-version="2.0.11",
+ org.wikipathways.client;bundle-version="2.0.11",
+ javax.xml.rpc;bundle-version="1.1.0",
+ org.bridgedb;bundle-version="1.1.0",
+ org.bridgedb.bio;bundle-version="1.1.0"
