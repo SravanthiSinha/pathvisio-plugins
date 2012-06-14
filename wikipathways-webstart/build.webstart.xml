@@ -11,17 +11,6 @@
   <!-- The path containing the jar files for all PathVisio plugins that need to be included -->
   <property name="plugins.jar.dir" value="webstart-plugin-jars" />
   
-  	<path id="project.class.path">
-		<fileset dir="${pathvisio.dir}/modules">
-			<include name="org.pathvisio.core.jar"/>
-			<include name="org.pathvisio.desktop.jar"/>
-			<include name="org.pathvisio.gui.jar"/>
-		</fileset>
-		<fileset dir="${pathvisio.dir}/lib">
-			<include name="**/*.jar"/>
-		</fileset>
-	</path>
-
   <target name="prepare">
 	<mkdir dir="build"/>
 	<fail message="Can't find ${pathvisio.dir}/modules/org.pathvisio.core.jar, please specify the path to pathvisio with -Dpathvisio.dir=....">
@@ -36,7 +25,7 @@
 		<!-- create a plug-in jar that contains all plug-in classes, as well as the dependent libraries -->
 		<unjar dest="build">
 			<fileset dir="${pathvisio.dir}"><include name="modules/*.jar"/></fileset>
-			<fileset dir="${pathvisio.dir}"><include name="lib/**/*.jar"/></fileset>
+			<fileset dir="${pathvisio.dir}"><include name="lib/*.jar"/></fileset>
 			<fileset dir="${plugins.jar.dir}"><include name="*.jar"/></fileset>
 		</unjar>
 		<jar jarfile="${jar.name}" manifest="META-INF/MANIFEST.MF">
