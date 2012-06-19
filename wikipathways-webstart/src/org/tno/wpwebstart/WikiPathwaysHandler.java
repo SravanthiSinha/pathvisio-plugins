@@ -74,7 +74,7 @@ public class WikiPathwaysHandler {
 	}
 
 	public boolean isPathwaySpecified() {
-		return getParameter(Parameter.pwId) == null;
+		return getParameter(Parameter.pwId) != null;
 	}
 	
 	public void loadWithProgress() throws Exception {
