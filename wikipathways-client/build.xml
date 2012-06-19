@@ -17,6 +17,7 @@
 			<include name="org.eclipse.osgi.jar"/>
 			<include name="com.springsource.org.jdom-1.1.0.jar"/>
 			<include name="javax.xml.rpc_1.1.0.v201005080400.jar"/>
+			<include name="org.pathvisio.jgoodies.forms.jar"/>
 		</fileset>
 		<fileset dir="${pathvisio.dir}/tools/cytoscape-gpml/lib">
 			<include name="**/*.jar"/>
