@@ -73,6 +73,10 @@ public class WikiPathwaysHandler {
 		return desktop;
 	}
 
+	public boolean isPathwaySpecified() {
+		return getParameter(Parameter.pwId) == null;
+	}
+	
 	public void loadWithProgress() throws Exception {
 		final ProgressKeeper pk = new ProgressKeeper();
 		final ProgressDialog d = new ProgressDialog(JOptionPane.getFrameForComponent(getDesktop().getSwingEngine().getApplicationPanel()),
@@ -82,7 +86,7 @@ public class WikiPathwaysHandler {
 			protected Boolean doInBackground() throws Exception {
 				pk.setTaskName("Opening pathway");
 				try {
-					load();
+					if(isPathwaySpecified()) load();
 				} catch(Exception e) {
 					throw e;
 				} finally {
@@ -106,7 +110,7 @@ public class WikiPathwaysHandler {
 			protected Boolean doInBackground() throws Exception {
 				pk.setTaskName("Saving pathway");
 				try {
-					save("");
+					if(isPathwaySpecified()) save("");
 				} catch(Exception e) {
 					throw e;
 				} finally {
@@ -127,8 +131,21 @@ public class WikiPathwaysHandler {
 		engine.setWrapper(desktop.getSwingEngine().createWrapper());
 		
 		File f = File.createTempFile(getParameter(Parameter.pwId) + " @ " + getParameter(Parameter.siteName) + " ", "." + Engine.PATHWAY_FILE_EXTENSION);
-		FileUtils.downloadFile(new URL(getParameter(Parameter.pwUrl)), f);
-		engine.openPathway(f);
+		
+		//Load from cache if available
+		boolean cacheLoaded = false;
+		if(f.exists()) {
+			try {
+				engine.openPathway(f);
+				cacheLoaded = true;
+			} catch(Exception e) {
+				Logger.log.warn("Unable to load cached pathway", e);
+			}
+		}
+		if(!cacheLoaded) {
+			FileUtils.downloadFile(new URL(getParameter(Parameter.pwUrl)), f);
+			engine.openPathway(f);
+		}
 
 		String species = desktop.getSwingEngine().getEngine().getActivePathway().getMappInfo().getOrganism();
 
