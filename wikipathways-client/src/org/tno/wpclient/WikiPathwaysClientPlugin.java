@@ -1,5 +1,6 @@
 package org.tno.wpclient;
 
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -8,6 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
@@ -39,7 +43,7 @@ import org.wikipathways.client.WikiPathwaysClient;
  * java ... -Dorg.tno.wpclient.0=http://www.wikipathways.org/wpi/webservice/webservice.php 
  *          -Dorg.tno.wpclient.1=http://mylocalinstance.com/wpi/webservice/webservice.php
  * 
- * Future features will include a gui to search and load pathways (like in the Cytoscape GPML plugin).
+ * This plugin also includes a dialog to search and load pathways from WikiPathways (like in the Cytoscape GPML plugin).
  * 
  * @author thomas
  */
@@ -55,14 +59,34 @@ public class WikiPathwaysClientPlugin implements Plugin {
 			tmpDir.mkdirs();
 			loadClients();
 			registerActions();
+			registerMenuOptions();
 		} catch (Exception e) {
 			Logger.log.error("Error while initializing WikiPathways client", e);
 			JOptionPane.showMessageDialog(desktop.getSwingEngine().getApplicationPanel(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
+	public Map<String, WikiPathwaysClient> getClients() {
+		return clients;
+	}
+	
 	public File getTmpDir() {
 		return tmpDir;
+	}
+	
+	private void registerMenuOptions() {
+		Action menuAction = new AbstractAction("Search WikiPathways") {
+			public void actionPerformed(ActionEvent e) {
+				SearchPanel p = new SearchPanel(WikiPathwaysClientPlugin.this);
+				JDialog d = new JDialog(
+						desktop.getFrame(), "Search WikiPathways", false);
+				d.getContentPane().add(p);
+				d.pack();
+				d.setVisible(true);
+				
+			}
+		};
+		desktop.registerMenuAction("Data", menuAction);
 	}
 	
 	private void loadClients() throws MalformedURLException, ServiceException {
