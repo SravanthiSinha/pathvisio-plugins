@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="TemplatePanelPlugin" default="jar" basedir=".">
+<project name="org.tno.templates" default="jar" basedir=".">
 
   <property name="pathvisio.dir" value="../../pathvisio/"/>
   <import file="${pathvisio.dir}/plugin-common.xml"/>

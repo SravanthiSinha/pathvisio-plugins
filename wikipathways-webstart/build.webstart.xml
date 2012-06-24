@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="WikiPathways webstart" default="jar" basedir=".">
+<project name="WikiPathways webstart" default="webstart" basedir=".">
 
 	<!-- always be java 1.5 compatible -->
 	<property name="ant.build.javac.target" value="1.5"/>
@@ -20,21 +20,6 @@
 	</fail>
   </target>
   
-	<target name="jar">
-		<echo>Creating JAR: ${jar.name}</echo>
-		<!-- create a plug-in jar that contains all plug-in classes, as well as the dependent libraries -->
-		<unjar dest="build">
-			<fileset dir="${pathvisio.dir}"><include name="modules/*.jar"/></fileset>
-			<fileset dir="${pathvisio.dir}"><include name="lib/*.jar"/></fileset>
-			<fileset dir="${plugins.jar.dir}"><include name="*.jar"/></fileset>
-		</unjar>
-		<jar jarfile="${jar.name}" manifest="META-INF/MANIFEST.MF">
-			<fileset dir="build">
-				<include name="**/*"/>
-			</fileset>
-		</jar>
-	</target>
-
   <target name="clean">
 	<delete dir="build"/>
   </target>
@@ -43,7 +28,7 @@
 	<delete file="${jar.name}"/>
   </target>
   
-  <target name="webstart" depends="jar">
+  <target name="webstart">
 	<fail message="Can't find ${pathvisio.dir}/pathvisio.jar, please specify the path to pathvisio with -Dpathvisio.dir=....">
 		<condition>
 			<not><available file="${pathvisio.dir}/pathvisio.jar"/></not>
@@ -78,10 +63,20 @@
 	<move file="webstart/pathvisio.jar" tofile="webstart/${base.name}.jar"/>
 	<!-- unjar everything to a temporary directory -->
 	<mkdir dir="build/temp"/>
+  	<!-- add custom plugin jars -->
+  	<copy toDir="build/temp">
+		<fileset dir="${plugins.jar.dir}">
+			<include name="*.jar"/>
+		</fileset>
+  	</copy>
+  	<copy file="dist/org.tno.wpwebstart.jar" toDir="build/temp"/>
 	<unjar src="${pathvisio.dir}/pathvisio.jar" dest="build/temp"/>
-	<copy file="${jar.name}" toDir="build/temp"/>
 	<!-- and jar everything back together again -->
-	<jar file="webstart/${base.name}.jar" basedir="build/temp"/>
+	<jar file="webstart/${base.name}.jar" basedir="build/temp">
+		<manifest>
+			<attribute name="Main-Class" value="org.pathvisio.launcher.PathVisioMain"/>
+		</manifest>
+	</jar>
 	<delete dir="build/temp"/>
 	
 	<!-- finally, sign the jar -->

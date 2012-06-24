@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="LoadIDMapperPlugin" default="jar" basedir=".">
+<project name="org.tno.idmapper" default="jar" basedir=".">
 
   <property name="pathvisio.dir" value="../../pathvisio/"/>
   <import file="${pathvisio.dir}/plugin-common.xml"/>
