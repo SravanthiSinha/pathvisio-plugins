@@ -53,7 +53,8 @@ public class WikiPathwaysHandler {
 	}
 
 	public String getParameter(Parameter name) {
-		return "" + parameters.get(name.name());
+		Object v = parameters.get(name.name());
+		return v == null ? null : ("" + v);
 	}
 
 	public void setParameter(Parameter name, String value) {

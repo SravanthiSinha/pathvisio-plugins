@@ -8,11 +8,14 @@ import javax.swing.SwingUtilities;
 import org.pathvisio.core.debug.Logger;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
+import org.tno.wpwebstart.WikiPathwaysHandler.Parameter;
 
 public class WikiPathwaysWebstartPlugin implements Plugin {
 	@Override
 	public void init(final PvDesktop desktop) {
 		final WikiPathwaysHandler wpHandler = new WikiPathwaysHandler(desktop, System.getProperties());
+		
+		if(wpHandler.getParameter(Parameter.pwId) == null) return;
 		
 		//Add button to save to wikipathways
 		Action saveAction = new WebSaveAction(wpHandler);
