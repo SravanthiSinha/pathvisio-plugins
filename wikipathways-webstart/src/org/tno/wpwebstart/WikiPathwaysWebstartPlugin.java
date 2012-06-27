@@ -1,9 +1,10 @@
 package org.tno.wpwebstart;
 
+import java.util.Properties;
+
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import org.pathvisio.core.debug.Logger;
 import org.pathvisio.desktop.PvDesktop;
@@ -13,7 +14,15 @@ import org.tno.wpwebstart.WikiPathwaysHandler.Parameter;
 public class WikiPathwaysWebstartPlugin implements Plugin {
 	@Override
 	public void init(final PvDesktop desktop) {
-		final WikiPathwaysHandler wpHandler = new WikiPathwaysHandler(desktop, System.getProperties());
+		//Fix for running from jnlp, look for properties with "jnlp." prefix
+		Properties props = System.getProperties();
+		for(Parameter p : Parameter.values()) {
+			if(props.get(p.name()) == null && System.getProperty("javaws." + p.name()) != null) {
+				props.put(p.name(), System.getProperty("javaws." + p.name()));
+			}
+		}
+		Logger.log.info("Modified system properties: " + props.toString());
+		final WikiPathwaysHandler wpHandler = new WikiPathwaysHandler(desktop, props);
 		
 		if(wpHandler.getParameter(Parameter.pwId) == null) return;
 		

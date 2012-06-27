@@ -27,7 +27,10 @@ public class TemplatePanelPlugin implements Plugin {
 		try {
 			//If template is specified by property, load it
 			String resProp = System.getProperty("org.tno.template.resource");
+			if(resProp == null) resProp = System.getProperty("javaws.org.tno.template.resource");
 			String fileProp = System.getProperty("org.tno.template.file");
+			if(fileProp == null) fileProp = System.getProperty("javaws.org.tno.template.file");
+			
 			//Else load last used template, if available
 			String last = PreferenceManager.getCurrent().get(TemplatePreference.LAST_TEMPLATE);
 			if(resProp != null) {

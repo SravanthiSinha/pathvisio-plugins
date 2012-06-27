@@ -199,6 +199,8 @@ public class WikiPathwaysHandler {
 		Object response = client.execute("WikiPathways.updatePathway", params);
 		//Update the revision in case we want to save again
 		setParameter(Parameter.revision, (String)response);
+		//Also save temporary file to prevent "want to save?" dialog upon closing PathVisio
+		desktop.getSwingEngine().savePathway();
 	}
 
 	static class XmlRpcCookieTransportFactory implements XmlRpcTransportFactory {
